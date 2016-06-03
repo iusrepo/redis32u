@@ -16,6 +16,7 @@ Release:           3%{?dist}
 Summary:           A persistent key-value database
 License:           BSD
 URL:               http://redis.io
+
 Source0:           http://download.redis.io/releases/%{name}-%{version}.tar.gz
 Source1:           %{name}.logrotate
 Source2:           %{name}-sentinel.service
@@ -26,6 +27,7 @@ Source6:           %{name}.init
 Source7:           %{name}-shutdown
 Source8:           %{name}-limit-systemd
 Source9:           %{name}-limit-init
+
 # To refresh patches:
 # tar xf redis-xxx.tar.gz && cd redis-xxx && git init && git add . && git commit -m "%{version} baseline"
 # git am %{patches}
@@ -39,6 +41,7 @@ Patch0003:            0003-redis-2.8.18-use-system-jemalloc.patch
 Patch0004:            0004-redis-2.8.18-disable-test-failed-on-slow-machine.patch
 # Fix sentinel configuration to use a different log file than redis
 Patch0005:            0005-redis-2.8.18-sentinel-configuration-file-fix.patch
+
 %if 0%{?with_perftools}
 BuildRequires:     gperftools-devel
 %else
@@ -46,17 +49,17 @@ BuildRequires:     jemalloc-devel
 %endif
 %if 0%{?with_tests}
 BuildRequires:     procps-ng
+BuildRequires:     tcl
 %endif
 %if 0%{?with_systemd}
 BuildRequires:     systemd
 %endif
-%if 0%{?with_tests}
-BuildRequires:     tcl
-%endif
+
 # Required for redis-shutdown
 Requires:          /bin/awk
 Requires:          logrotate
 Requires(pre):     shadow-utils
+
 %if 0%{?with_systemd}
 Requires(post):    systemd
 Requires(preun):   systemd
@@ -67,6 +70,7 @@ Requires(preun):   chkconfig
 Requires(preun):   initscripts
 Requires(postun):  initscripts
 %endif
+
 
 %description
 Redis is an advanced key-value store. It is often referred to as a data 
@@ -93,6 +97,7 @@ a cache.
 
 You can use Redis from most programming languages also.
 
+
 %prep
 %setup -q
 rm -frv deps/jemalloc
@@ -114,6 +119,7 @@ sed -i -e 's|$(LDFLAGS)|%{?__global_ldflags}|g' deps/hiredis/Makefile
 sed -i -e 's|$(CFLAGS)|%{optflags}|g' deps/linenoise/Makefile
 sed -i -e 's|$(LDFLAGS)|%{?__global_ldflags}|g' deps/linenoise/Makefile
 
+
 %build
 make %{?_smp_mflags} \
     DEBUG="" \
@@ -126,6 +132,7 @@ make %{?_smp_mflags} \
     MALLOC=jemalloc \
 %endif
     all
+
 
 %install
 make install INSTALL="install -p" PREFIX=%{buildroot}%{_prefix}
@@ -142,18 +149,18 @@ install -pDm644 %{S:1} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 install -pDm644 %{name}.conf %{buildroot}%{_sysconfdir}/%{name}.conf
 install -pDm644 sentinel.conf %{buildroot}%{_sysconfdir}/%{name}-sentinel.conf
 
-# Install Systemd unit files.
 %if 0%{?with_systemd}
+# Install Systemd unit files.
 mkdir -p %{buildroot}%{_unitdir}
 install -pm644 %{S:3} %{buildroot}%{_unitdir}
 install -pm644 %{S:2} %{buildroot}%{_unitdir}
-
 # Install systemd tmpfiles config.
 install -pDm644 %{S:4} %{buildroot}%{_tmpfilesdir}/%{name}.conf
 # Install systemd limit files (requires systemd >= 204)
 install -p -D -m 644 %{S:8} %{buildroot}%{_sysconfdir}/systemd/system/%{name}.service.d/limit.conf
 install -p -D -m 644 %{S:8} %{buildroot}%{_sysconfdir}/systemd/system/%{name}-sentinel.service.d/limit.conf
-%else # install SysV service files
+%else
+# Install SysV service files.
 install -pDm755 %{S:5} %{buildroot}%{_initrddir}/%{name}-sentinel
 install -pDm755 %{S:6} %{buildroot}%{_initrddir}/%{name}
 install -p -D -m 644 %{S:9} %{buildroot}%{_sysconfdir}/security/limits.d/95-%{name}.conf
@@ -169,11 +176,13 @@ ln -sf %{name}-server %{buildroot}%{_bindir}/%{name}-sentinel
 # Install redis-shutdown
 install -pDm755 %{S:7} %{buildroot}%{_bindir}/%{name}-shutdown
 
+
 %check
 %if 0%{?with_tests}
 make test ||:
 make test-sentinel ||:
 %endif
+
 
 %pre
 getent group %{name} &> /dev/null || \
@@ -183,6 +192,7 @@ useradd -r -g %{name} -d %{_sharedstatedir}/%{name} -s /sbin/nologin \
 -c 'Redis Database Server' %{name} &> /dev/null
 exit 0
 
+
 %post
 %if 0%{?with_systemd}
 %systemd_post %{name}.service
@@ -191,6 +201,7 @@ exit 0
 chkconfig --add %{name}
 chkconfig --add %{name}-sentinel
 %endif
+
 
 %preun
 %if 0%{?with_systemd}
@@ -205,6 +216,7 @@ if [ $1 -eq 0 ] ; then
 fi
 %endif
 
+
 %postun
 %if 0%{?with_systemd}
 %systemd_postun_with_restart %{name}.service
@@ -215,6 +227,7 @@ if [ "$1" -ge "1" ] ; then
     service %{name}-sentinel condrestart >/dev/null 2>&1 || :
 fi
 %endif
+
 
 %files
 %{!?_licensedir:%global license %%doc}
