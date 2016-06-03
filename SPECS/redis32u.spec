@@ -14,7 +14,7 @@
 %endif
 
 # Tests fail in mock, not in local build.
-%global with_tests   %{?_with_tests:1}%{!?_with_tests:0}
+%global with_tests 1
 
 Name:              redis32u
 Version:           3.2.0
@@ -192,8 +192,8 @@ install -pDm755 %{S:7} %{buildroot}%{_bindir}/redis-shutdown
 
 %check
 %if 0%{?with_tests}
-make test ||:
-make test-sentinel ||:
+make test
+make test-sentinel
 %endif
 
 
@@ -274,6 +274,7 @@ fi
 - Port from Fedora to IUS
 - Rebase Patch0001 and Patch0002
 - Use either procps or procps-ng as appropriate
+- Enable test suite
 
 * Mon Feb  8 2016 Haïkel Guémar <hguemar@fedoraproject.org> - 3.0.6-3
 - Fix redis-shutdown to handle password-protected instances shutdown
