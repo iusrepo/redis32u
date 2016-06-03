@@ -17,16 +17,16 @@ Summary:           A persistent key-value database
 License:           BSD
 URL:               http://redis.io
 
-Source0:           http://download.redis.io/releases/%{name}-%{version}.tar.gz
-Source1:           %{name}.logrotate
-Source2:           %{name}-sentinel.service
-Source3:           %{name}.service
-Source4:           %{name}.tmpfiles
-Source5:           %{name}-sentinel.init
-Source6:           %{name}.init
-Source7:           %{name}-shutdown
-Source8:           %{name}-limit-systemd
-Source9:           %{name}-limit-init
+Source0:           http://download.redis.io/releases/redis-%{version}.tar.gz
+Source1:           redis.logrotate
+Source2:           redis-sentinel.service
+Source3:           redis.service
+Source4:           redis.tmpfiles
+Source5:           redis-sentinel.init
+Source6:           redis.init
+Source7:           redis-shutdown
+Source8:           redis-limit-systemd
+Source9:           redis-limit-init
 
 # To refresh patches:
 # tar xf redis-xxx.tar.gz && cd redis-xxx && git init && git add . && git commit -m "%{version} baseline"
@@ -142,16 +142,16 @@ make %{?_smp_mflags} \
 make install INSTALL="install -p" PREFIX=%{buildroot}%{_prefix}
 
 # Filesystem.
-install -d %{buildroot}%{_sharedstatedir}/%{name}
-install -d %{buildroot}%{_localstatedir}/log/%{name}
-install -d %{buildroot}%{_localstatedir}/run/%{name}
+install -d %{buildroot}%{_sharedstatedir}/redis
+install -d %{buildroot}%{_localstatedir}/log/redis
+install -d %{buildroot}%{_localstatedir}/run/redis
 
 # Install logrotate file.
-install -pDm644 %{S:1} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
+install -pDm644 %{S:1} %{buildroot}%{_sysconfdir}/logrotate.d/redis
 
 # Install configuration files.
-install -pDm644 %{name}.conf %{buildroot}%{_sysconfdir}/%{name}.conf
-install -pDm644 sentinel.conf %{buildroot}%{_sysconfdir}/%{name}-sentinel.conf
+install -pDm644 redis.conf %{buildroot}%{_sysconfdir}/redis.conf
+install -pDm644 sentinel.conf %{buildroot}%{_sysconfdir}/redis-sentinel.conf
 
 %if 0%{?with_systemd}
 # Install Systemd unit files.
@@ -159,26 +159,26 @@ mkdir -p %{buildroot}%{_unitdir}
 install -pm644 %{S:3} %{buildroot}%{_unitdir}
 install -pm644 %{S:2} %{buildroot}%{_unitdir}
 # Install systemd tmpfiles config.
-install -pDm644 %{S:4} %{buildroot}%{_tmpfilesdir}/%{name}.conf
+install -pDm644 %{S:4} %{buildroot}%{_tmpfilesdir}/redis.conf
 # Install systemd limit files (requires systemd >= 204)
-install -p -D -m 644 %{S:8} %{buildroot}%{_sysconfdir}/systemd/system/%{name}.service.d/limit.conf
-install -p -D -m 644 %{S:8} %{buildroot}%{_sysconfdir}/systemd/system/%{name}-sentinel.service.d/limit.conf
+install -p -D -m 644 %{S:8} %{buildroot}%{_sysconfdir}/systemd/system/redis.service.d/limit.conf
+install -p -D -m 644 %{S:8} %{buildroot}%{_sysconfdir}/systemd/system/redis-sentinel.service.d/limit.conf
 %else
 # Install SysV service files.
-install -pDm755 %{S:5} %{buildroot}%{_initrddir}/%{name}-sentinel
-install -pDm755 %{S:6} %{buildroot}%{_initrddir}/%{name}
-install -p -D -m 644 %{S:9} %{buildroot}%{_sysconfdir}/security/limits.d/95-%{name}.conf
+install -pDm755 %{S:5} %{buildroot}%{_initrddir}/redis-sentinel
+install -pDm755 %{S:6} %{buildroot}%{_initrddir}/redis
+install -p -D -m 644 %{S:9} %{buildroot}%{_sysconfdir}/security/limits.d/95-redis.conf
 %endif
 
 # Fix non-standard-executable-perm error.
-chmod 755 %{buildroot}%{_bindir}/%{name}-*
+chmod 755 %{buildroot}%{_bindir}/redis-*
 
 # create redis-sentinel command as described on
 # http://redis.io/topics/sentinel
-ln -sf %{name}-server %{buildroot}%{_bindir}/%{name}-sentinel
+ln -sf redis-server %{buildroot}%{_bindir}/redis-sentinel
 
 # Install redis-shutdown
-install -pDm755 %{S:7} %{buildroot}%{_bindir}/%{name}-shutdown
+install -pDm755 %{S:7} %{buildroot}%{_bindir}/redis-shutdown
 
 
 %check
@@ -189,46 +189,46 @@ make test-sentinel ||:
 
 
 %pre
-getent group %{name} &> /dev/null || \
-groupadd -r %{name} &> /dev/null
-getent passwd %{name} &> /dev/null || \
-useradd -r -g %{name} -d %{_sharedstatedir}/%{name} -s /sbin/nologin \
--c 'Redis Database Server' %{name} &> /dev/null
+getent group redis &> /dev/null || \
+groupadd -r redis &> /dev/null
+getent passwd redis &> /dev/null || \
+useradd -r -g redis -d %{_sharedstatedir}/redis -s /sbin/nologin \
+-c 'Redis Database Server' redis &> /dev/null
 exit 0
 
 
 %post
 %if 0%{?with_systemd}
-%systemd_post %{name}.service
-%systemd_post %{name}-sentinel.service
+%systemd_post redis.service
+%systemd_post redis-sentinel.service
 %else
-chkconfig --add %{name}
-chkconfig --add %{name}-sentinel
+chkconfig --add redis
+chkconfig --add redis-sentinel
 %endif
 
 
 %preun
 %if 0%{?with_systemd}
-%systemd_preun %{name}.service
-%systemd_preun %{name}-sentinel.service
+%systemd_preun redis.service
+%systemd_preun redis-sentinel.service
 %else
 if [ $1 -eq 0 ] ; then
-    service %{name} stop &> /dev/null
-    chkconfig --del %{name} &> /dev/null
-    service %{name}-sentinel stop &> /dev/null
-    chkconfig --del %{name}-sentinel &> /dev/null
+    service redis stop &> /dev/null
+    chkconfig --del redis &> /dev/null
+    service redis-sentinel stop &> /dev/null
+    chkconfig --del redis-sentinel &> /dev/null
 fi
 %endif
 
 
 %postun
 %if 0%{?with_systemd}
-%systemd_postun_with_restart %{name}.service
-%systemd_postun_with_restart %{name}-sentinel.service
+%systemd_postun_with_restart redis.service
+%systemd_postun_with_restart redis-sentinel.service
 %else
 if [ "$1" -ge "1" ] ; then
-    service %{name} condrestart >/dev/null 2>&1 || :
-    service %{name}-sentinel condrestart >/dev/null 2>&1 || :
+    service redis condrestart >/dev/null 2>&1 || :
+    service redis-sentinel condrestart >/dev/null 2>&1 || :
 fi
 %endif
 
@@ -237,25 +237,25 @@ fi
 %{!?_licensedir:%global license %%doc}
 %license COPYING
 %doc 00-RELEASENOTES BUGS CONTRIBUTING MANIFESTO README
-%config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
-%attr(0644, redis, root) %config(noreplace) %{_sysconfdir}/%{name}.conf
-%attr(0644, redis, root) %config(noreplace) %{_sysconfdir}/%{name}-sentinel.conf
-%dir %attr(0755, redis, redis) %{_sharedstatedir}/%{name}
-%dir %attr(0755, redis, redis) %{_localstatedir}/log/%{name}
-%dir %attr(0755, redis, redis) %{_localstatedir}/run/%{name}
-%{_bindir}/%{name}-*
+%config(noreplace) %{_sysconfdir}/logrotate.d/redis
+%attr(0644, redis, root) %config(noreplace) %{_sysconfdir}/redis.conf
+%attr(0644, redis, root) %config(noreplace) %{_sysconfdir}/redis-sentinel.conf
+%dir %attr(0755, redis, redis) %{_sharedstatedir}/redis
+%dir %attr(0755, redis, redis) %{_localstatedir}/log/redis
+%dir %attr(0755, redis, redis) %{_localstatedir}/run/redis
+%{_bindir}/redis-*
 %if 0%{?with_systemd}
-%{_tmpfilesdir}/%{name}.conf
-%{_unitdir}/%{name}.service
-%{_unitdir}/%{name}-sentinel.service
-%dir %{_sysconfdir}/systemd/system/%{name}.service.d
-%config(noreplace) %{_sysconfdir}/systemd/system/%{name}.service.d/limit.conf
-%dir %{_sysconfdir}/systemd/system/%{name}-sentinel.service.d
-%config(noreplace) %{_sysconfdir}/systemd/system/%{name}-sentinel.service.d/limit.conf
+%{_tmpfilesdir}/redis.conf
+%{_unitdir}/redis.service
+%{_unitdir}/redis-sentinel.service
+%dir %{_sysconfdir}/systemd/system/redis.service.d
+%config(noreplace) %{_sysconfdir}/systemd/system/redis.service.d/limit.conf
+%dir %{_sysconfdir}/systemd/system/redis-sentinel.service.d
+%config(noreplace) %{_sysconfdir}/systemd/system/redis-sentinel.service.d/limit.conf
 %else
-%{_initrddir}/%{name}
-%{_initrddir}/%{name}-sentinel
-%config(noreplace) %{_sysconfdir}/security/limits.d/95-%{name}.conf
+%{_initrddir}/redis
+%{_initrddir}/redis-sentinel
+%config(noreplace) %{_sysconfdir}/security/limits.d/95-redis.conf
 %endif
 
 
