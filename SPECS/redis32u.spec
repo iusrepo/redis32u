@@ -14,6 +14,9 @@ Name:              redis32u
 Version:           3.2.0
 Release:           1.ius%{?dist}
 Summary:           A persistent key-value database
+%if 0%{?rhel} <= 6
+Group:             Applications/Databases
+%endif
 License:           BSD
 URL:               http://redis.io
 
