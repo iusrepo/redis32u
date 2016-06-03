@@ -7,6 +7,12 @@
 %global with_systemd 0
 %endif
 
+%if 0%{?fedora} >= 18 || 0%{?rhel} >= 7
+%global procps procps-ng
+%else
+%global procps procps
+%endif
+
 # Tests fail in mock, not in local build.
 %global with_tests   %{?_with_tests:1}%{!?_with_tests:0}
 
@@ -51,7 +57,7 @@ BuildRequires:     gperftools-devel
 BuildRequires:     jemalloc-devel
 %endif
 %if 0%{?with_tests}
-BuildRequires:     procps-ng
+BuildRequires:     %{procps}
 BuildRequires:     tcl
 %endif
 %if 0%{?with_systemd}
@@ -267,6 +273,7 @@ fi
 - Upstream 3.2.0
 - Port from Fedora to IUS
 - Rebase Patch0001 and Patch0002
+- Use either procps or procps-ng as appropriate
 
 * Mon Feb  8 2016 Haïkel Guémar <hguemar@fedoraproject.org> - 3.0.6-3
 - Fix redis-shutdown to handle password-protected instances shutdown
