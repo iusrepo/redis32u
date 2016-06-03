@@ -10,9 +10,9 @@
 # Tests fail in mock, not in local build.
 %global with_tests   %{?_with_tests:1}%{!?_with_tests:0}
 
-Name:              redis
-Version:           3.0.6
-Release:           3%{?dist}
+Name:              redis32u
+Version:           3.2.0
+Release:           1.ius%{?dist}
 Summary:           A persistent key-value database
 License:           BSD
 URL:               http://redis.io
@@ -71,6 +71,10 @@ Requires(preun):   initscripts
 Requires(postun):  initscripts
 %endif
 
+Provides: redis = %{version}-%{release}
+Provides: redis%{?_isa} = %{version}-%{release}
+Conflicts: redis < %{version}
+
 
 %description
 Redis is an advanced key-value store. It is often referred to as a data 
@@ -99,7 +103,7 @@ You can use Redis from most programming languages also.
 
 
 %prep
-%setup -q
+%setup -q -n redis-%{version}
 rm -frv deps/jemalloc
 %patch0001 -p1
 %patch0002 -p1
@@ -256,6 +260,10 @@ fi
 
 
 %changelog
+* Fri Jun 03 2016 Carl George <carl.george@rackspace.com> - 3.2.0-1.ius
+- Upstream 3.2.0
+- Port from Fedora to IUS
+
 * Mon Feb  8 2016 Haïkel Guémar <hguemar@fedoraproject.org> - 3.0.6-3
 - Fix redis-shutdown to handle password-protected instances shutdown
 
