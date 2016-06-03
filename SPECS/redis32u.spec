@@ -239,7 +239,7 @@ fi
 %files
 %{!?_licensedir:%global license %%doc}
 %license COPYING
-%doc 00-RELEASENOTES BUGS CONTRIBUTING MANIFESTO README
+%doc 00-RELEASENOTES BUGS CONTRIBUTING MANIFESTO README.md
 %config(noreplace) %{_sysconfdir}/logrotate.d/redis
 %attr(0644, redis, root) %config(noreplace) %{_sysconfdir}/redis.conf
 %attr(0644, redis, root) %config(noreplace) %{_sysconfdir}/redis-sentinel.conf
