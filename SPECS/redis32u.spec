@@ -223,7 +223,7 @@ fi
 %systemd_preun redis.service
 %systemd_preun redis-sentinel.service
 %else
-if [ $1 -eq 0 ] ; then
+if [ $1 -eq 0 ]; then
     service redis stop &> /dev/null || :
     chkconfig --del redis &> /dev/null || :
     service redis-sentinel stop &> /dev/null || :
@@ -237,9 +237,9 @@ fi
 %systemd_postun_with_restart redis.service
 %systemd_postun_with_restart redis-sentinel.service
 %else
-if [ "$1" -ge "1" ] ; then
-    service redis condrestart >/dev/null 2>&1 || :
-    service redis-sentinel condrestart >/dev/null 2>&1 || :
+if [ $1 -ge 1 ]; then
+    service redis condrestart &> /dev/null || :
+    service redis-sentinel condrestart &> /dev/null || :
 fi
 %endif
 
