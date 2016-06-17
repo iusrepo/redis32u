@@ -17,7 +17,7 @@
 %global with_tests 1
 
 Name:              redis32u
-Version:           3.2.0
+Version:           3.2.1
 Release:           1.ius%{?dist}
 Summary:           A persistent key-value database
 %if 0%{?rhel} <= 6
@@ -269,6 +269,9 @@ fi
 
 
 %changelog
+* Fri Jun 17 2016 Carl George <carl.george@rackspace.com> - 3.2.1-1.ius
+- Latest upstream
+
 * Fri Jun 03 2016 Carl George <carl.george@rackspace.com> - 3.2.0-1.ius
 - Upstream 3.2.0
 - Port from Fedora to IUS
