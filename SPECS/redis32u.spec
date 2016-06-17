@@ -211,8 +211,10 @@ exit 0
 %systemd_post redis.service
 %systemd_post redis-sentinel.service
 %else
-chkconfig --add redis
-chkconfig --add redis-sentinel
+if [ $1 -eq 1 ]; then
+    chkconfig --add redis
+    chkconfig --add redis-sentinel
+fi
 %endif
 
 
@@ -272,6 +274,7 @@ fi
 * Fri Jun 17 2016 Carl George <carl.george@rackspace.com> - 3.2.1-1.ius
 - Latest upstream
 - Refresh Patch1
+- Only run `chkconfig --add` on initial install
 
 * Fri Jun 03 2016 Carl George <carl.george@rackspace.com> - 3.2.0-1.ius
 - Upstream 3.2.0
