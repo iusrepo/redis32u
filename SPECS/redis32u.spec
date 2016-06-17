@@ -212,8 +212,8 @@ exit 0
 %systemd_post redis-sentinel.service
 %else
 if [ $1 -eq 1 ]; then
-    chkconfig --add redis
-    chkconfig --add redis-sentinel
+    chkconfig --add redis &> /dev/null || :
+    chkconfig --add redis-sentinel &> /dev/null || :
 fi
 %endif
 
@@ -224,10 +224,10 @@ fi
 %systemd_preun redis-sentinel.service
 %else
 if [ $1 -eq 0 ] ; then
-    service redis stop &> /dev/null
-    chkconfig --del redis &> /dev/null
-    service redis-sentinel stop &> /dev/null
-    chkconfig --del redis-sentinel &> /dev/null
+    service redis stop &> /dev/null || :
+    chkconfig --del redis &> /dev/null || :
+    service redis-sentinel stop &> /dev/null || :
+    chkconfig --del redis-sentinel &> /dev/null || :
 fi
 %endif
 
@@ -275,6 +275,7 @@ fi
 - Latest upstream
 - Refresh Patch1
 - Only run `chkconfig --add` on initial install
+- Ensure scriptlets have 0 exit status
 
 * Fri Jun 03 2016 Carl George <carl.george@rackspace.com> - 3.2.0-1.ius
 - Upstream 3.2.0
