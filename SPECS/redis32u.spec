@@ -43,7 +43,7 @@ Source9:           redis-limit-init
 # Then refresh your patches
 # git format-patch HEAD~<number of expected patches>
 # Update configuration for Fedora
-Patch0001:            0001-redis-3.2.0-redis-conf.patch
+Patch0001:            0001-redis-3.2.1-redis-conf.patch
 Patch0002:            0002-redis-3.2.0-deps-library-fPIC-performance-tuning.patch
 Patch0003:            0003-redis-2.8.18-use-system-jemalloc.patch
 # tests/integration/replication-psync.tcl failed on slow machines(GITHUB #1417)
@@ -271,6 +271,7 @@ fi
 %changelog
 * Fri Jun 17 2016 Carl George <carl.george@rackspace.com> - 3.2.1-1.ius
 - Latest upstream
+- Refresh Patch1
 
 * Fri Jun 03 2016 Carl George <carl.george@rackspace.com> - 3.2.0-1.ius
 - Upstream 3.2.0
