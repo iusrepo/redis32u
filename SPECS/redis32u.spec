@@ -2,9 +2,9 @@
 %global with_perftools 0
 
 %if 0%{?fedora} >= 19 || 0%{?rhel} >= 7
-%global with_systemd 1
+%bcond_without systemd
 %else
-%global with_systemd 0
+%bcond_with systemd
 %endif
 
 %if 0%{?fedora} >= 18 || 0%{?rhel} >= 7
@@ -60,7 +60,7 @@ BuildRequires:     jemalloc-devel
 BuildRequires:     %{procps}
 BuildRequires:     tcl
 %endif
-%if 0%{?with_systemd}
+%if %{with systemd}
 BuildRequires:     systemd
 %endif
 
@@ -69,7 +69,7 @@ Requires:          /bin/awk
 Requires:          logrotate
 Requires(pre):     shadow-utils
 
-%if 0%{?with_systemd}
+%if %{with systemd}
 Requires(post):    systemd
 Requires(preun):   systemd
 Requires(postun):  systemd
@@ -162,7 +162,7 @@ install -pDm644 %{S:1} %{buildroot}%{_sysconfdir}/logrotate.d/redis
 install -pDm644 redis.conf %{buildroot}%{_sysconfdir}/redis.conf
 install -pDm644 sentinel.conf %{buildroot}%{_sysconfdir}/redis-sentinel.conf
 
-%if 0%{?with_systemd}
+%if %{with systemd}
 # Install Systemd unit files.
 mkdir -p %{buildroot}%{_unitdir}
 install -pm644 %{S:3} %{buildroot}%{_unitdir}
@@ -207,7 +207,7 @@ exit 0
 
 
 %post
-%if 0%{?with_systemd}
+%if %{with systemd}
 %systemd_post redis.service
 %systemd_post redis-sentinel.service
 %else
@@ -217,7 +217,7 @@ chkconfig --add redis-sentinel
 
 
 %preun
-%if 0%{?with_systemd}
+%if %{with systemd}
 %systemd_preun redis.service
 %systemd_preun redis-sentinel.service
 %else
@@ -231,7 +231,7 @@ fi
 
 
 %postun
-%if 0%{?with_systemd}
+%if %{with systemd}
 %systemd_postun_with_restart redis.service
 %systemd_postun_with_restart redis-sentinel.service
 %else
@@ -253,7 +253,7 @@ fi
 %dir %attr(0755, redis, redis) %{_localstatedir}/log/redis
 %dir %attr(0755, redis, redis) %{_localstatedir}/run/redis
 %{_bindir}/redis-*
-%if 0%{?with_systemd}
+%if %{with systemd}
 %{_tmpfilesdir}/redis.conf
 %{_unitdir}/redis.service
 %{_unitdir}/redis-sentinel.service
