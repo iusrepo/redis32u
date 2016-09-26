@@ -17,7 +17,7 @@
 %global with_tests 1
 
 Name:              redis32u
-Version:           3.2.3
+Version:           3.2.4
 Release:           1.ius%{?dist}
 Summary:           A persistent key-value database
 %if 0%{?rhel} <= 6
@@ -49,7 +49,7 @@ Patch0003:            0003-redis-2.8.18-use-system-jemalloc.patch
 # tests/integration/replication-psync.tcl failed on slow machines(GITHUB #1417)
 Patch0004:            0004-redis-2.8.18-disable-test-failed-on-slow-machine.patch
 # Fix sentinel configuration to use a different log file than redis
-Patch0005:            0005-redis-2.8.18-sentinel-configuration-file-fix.patch
+Patch0005:            0005-redis-3.2.4-sentinel-configuration-file-fix.patch
 
 %if 0%{?with_perftools}
 BuildRequires:     gperftools-devel
@@ -271,6 +271,9 @@ fi
 
 
 %changelog
+* Mon Sep 26 2016 Carl George <carl.george@rackspace.com> - 3.2.4-1.ius
+- Latest upstream
+
 * Fri Aug 05 2016 Carl George <carl.george@rackspace.com> - 3.2.3-1.ius
 - Latest upstream
 

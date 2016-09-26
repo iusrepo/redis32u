@@ -1,0 +1,16 @@
+based on http://pkgs.fedoraproject.org/cgit/rpms/redis.git/tree/0005-redis-2.8.18-sentinel-configuration-file-fix.patch
+rebased for 3.2.4
+
+diff -Naurp a/sentinel.conf b/sentinel.conf
+--- a/sentinel.conf	2016-09-26 02:10:17.000000000 -0500
++++ b/sentinel.conf	2016-09-26 08:28:02.457777310 -0500
+@@ -193,4 +193,9 @@ sentinel failover-timeout mymaster 18000
+ # Example:
+ #
+ # sentinel client-reconfig-script mymaster /var/redis/reconfig.sh
++#
++# Specify the log file name. Also the empty string can be used to force
++# Redis to log on the standard output. Note that if you use standard
++# output for logging but daemonize, logs will be sent to /dev/null
++logfile /var/log/redis/sentinel.log
+ 
