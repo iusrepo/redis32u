@@ -17,7 +17,7 @@
 %global with_tests 1
 
 Name:              redis32u
-Version:           3.2.4
+Version:           3.2.5
 Release:           1.ius%{?dist}
 Summary:           A persistent key-value database
 %if 0%{?rhel} <= 6
@@ -45,7 +45,7 @@ Source9:           redis-limit-init
 # Update configuration for Fedora
 Patch0001:            0001-redis-3.2.1-redis-conf.patch
 Patch0002:            0002-redis-3.2.0-deps-library-fPIC-performance-tuning.patch
-Patch0003:            0003-redis-2.8.18-use-system-jemalloc.patch
+Patch0003:            0003-redis-3.2.5-use-system-jemalloc.patch
 # tests/integration/replication-psync.tcl failed on slow machines(GITHUB #1417)
 Patch0004:            0004-redis-2.8.18-disable-test-failed-on-slow-machine.patch
 # Fix sentinel configuration to use a different log file than redis
@@ -271,6 +271,10 @@ fi
 
 
 %changelog
+* Thu Oct 27 2016 Carl George <carl.george@rackspace.com> - 3.2.5-1.ius
+- Latest upstream
+- Refresh Patch0003
+
 * Mon Sep 26 2016 Carl George <carl.george@rackspace.com> - 3.2.4-1.ius
 - Latest upstream
 

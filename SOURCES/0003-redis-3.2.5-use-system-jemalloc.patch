@@ -1,0 +1,17 @@
+Adapted from Fedora patch 0003-redis-2.8.18-use-system-jemalloc.patch, ported
+to apply cleanly on redis 3.2.5.
+
+diff -Naurp a/src/Makefile b/src/Makefile
+--- a/src/Makefile	2016-10-26 02:17:45.000000000 -0500
++++ b/src/Makefile	2016-10-27 10:32:30.469913743 -0500
+@@ -104,8 +104,8 @@ endif
+ 
+ ifeq ($(MALLOC),jemalloc)
+ 	DEPENDENCY_TARGETS+= jemalloc
+-	FINAL_CFLAGS+= -DUSE_JEMALLOC -I../deps/jemalloc/include
+-	FINAL_LIBS+= ../deps/jemalloc/lib/libjemalloc.a
++	FINAL_CFLAGS+= -DUSE_JEMALLOC -DJEMALLOC_NO_DEMANGLE -I/usr/include/jemalloc
++	FINAL_LIBS+= -ljemalloc
+ endif
+ 
+ REDIS_CC=$(QUIET_CC)$(CC) $(FINAL_CFLAGS)
