@@ -17,7 +17,7 @@
 %global with_tests 1
 
 Name:              redis32u
-Version:           3.2.5
+Version:           3.2.6
 Release:           1.ius%{?dist}
 Summary:           A persistent key-value database
 %if 0%{?rhel} <= 6
@@ -271,6 +271,9 @@ fi
 
 
 %changelog
+* Tue Dec 06 2016 Ben Harper <ben.harper@rackspace.com> - 3.2.6-1.ius
+- Latest upstream
+
 * Thu Oct 27 2016 Carl George <carl.george@rackspace.com> - 3.2.5-1.ius
 - Latest upstream
 - Refresh Patch0003
