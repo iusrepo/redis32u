@@ -17,7 +17,7 @@
 %global with_tests 1
 
 Name:              redis32u
-Version:           3.2.8
+Version:           3.2.9
 Release:           1.ius%{?dist}
 Summary:           A persistent key-value database
 %if 0%{?rhel} <= 6
@@ -271,7 +271,10 @@ fi
 
 
 %changelog
-* Mon Feb 13 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.8-1
+* Wed May 17 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.9-1.ius
+- Latest upstream
+
+* Mon Feb 13 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.8-1.ius
 - Latest upstream
 
 * Tue Jan 31 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.7-1.ius
