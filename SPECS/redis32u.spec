@@ -7,14 +7,7 @@
 %bcond_with systemd
 %endif
 
-%if 0%{?fedora} >= 18 || 0%{?rhel} >= 7
-%global procps procps-ng
-%else
-%global procps procps
-%endif
-
-# Tests fail in mock, not in local build.
-%global with_tests 1
+%bcond_without tests
 
 Name:              redis32u
 Version:           3.2.9
@@ -43,26 +36,28 @@ Source9:           redis-limit-init
 # Then refresh your patches
 # git format-patch HEAD~<number of expected patches>
 # Update configuration for Fedora
-Patch0001:            0001-redis-3.2.1-redis-conf.patch
-Patch0002:            0002-redis-3.2.0-deps-library-fPIC-performance-tuning.patch
-Patch0003:            0003-redis-3.2.5-use-system-jemalloc.patch
+Patch0001:         0001-redis-3.2.1-redis-conf.patch
+Patch0002:         0002-redis-3.2.0-deps-library-fPIC-performance-tuning.patch
+Patch0003:         0003-redis-3.2.5-use-system-jemalloc.patch
 # tests/integration/replication-psync.tcl failed on slow machines(GITHUB #1417)
-Patch0004:            0004-redis-2.8.18-disable-test-failed-on-slow-machine.patch
+Patch0004:         0004-redis-2.8.18-disable-test-failed-on-slow-machine.patch
 # Fix sentinel configuration to use a different log file than redis
-Patch0005:            0005-redis-3.2.4-sentinel-configuration-file-fix.patch
+Patch0005:         0005-redis-3.2.4-sentinel-configuration-file-fix.patch
 
 %if 0%{?with_perftools}
 BuildRequires:     gperftools-devel
 %else
 BuildRequires:     jemalloc-devel
 %endif
-%if 0%{?with_tests}
-BuildRequires:     %{procps}
+%if %{with tests}
+%if 0%{?fedora} >= 18 || 0%{?rhel} >= 7
+BuildRequires:     procps-ng
+%else
+BuildRequires:     procps
+%endif
 BuildRequires:     tcl
 %endif
-%if %{with systemd}
-BuildRequires:     systemd
-%endif
+%{?with_systemd:BuildRequires: systemd}
 
 # Required for redis-shutdown
 Requires:          /bin/awk
@@ -182,10 +177,6 @@ install -p -D -m 644 %{S:9} %{buildroot}%{_sysconfdir}/security/limits.d/95-redi
 # Fix non-standard-executable-perm error.
 chmod 755 %{buildroot}%{_bindir}/redis-*
 
-# create redis-sentinel command as described on
-# http://redis.io/topics/sentinel
-ln -sf redis-server %{buildroot}%{_bindir}/redis-sentinel
-
 # Install redis-shutdown
 install -pDm755 %{S:7} %{buildroot}%{_bindir}/redis-shutdown
 
@@ -245,7 +236,6 @@ fi
 
 
 %files
-%{!?_licensedir:%global license %%doc}
 %license COPYING
 %doc 00-RELEASENOTES BUGS CONTRIBUTING MANIFESTO README.md
 %config(noreplace) %{_sysconfdir}/logrotate.d/redis
