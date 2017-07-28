@@ -257,7 +257,7 @@ fi
 %attr(0640, redis, root) %config(noreplace) %{_sysconfdir}/redis-sentinel.conf
 %dir %attr(0750, redis, redis) %{_sharedstatedir}/redis
 %dir %attr(0750, redis, redis) %{_localstatedir}/log/redis
-%dir %attr(0750, redis, redis) %{_localstatedir}/run/redis
+%dir %attr(0750, redis, redis) %ghost %{_localstatedir}/run/redis
 %{_bindir}/redis-*
 %{_libexecdir}/redis-*
 %{_mandir}/man1/redis*
@@ -285,6 +285,8 @@ fi
 - Provide redis-check-rdb as a symlink to redis-server #1374736 https://github.com/antirez/redis/pull/3494 (Fedora)
 - Data and configuration should not be publicly readable #1374700 (Fedora)
 - Fix a shutdown failure with Unix domain sockets (RHBZ #1444988) (Fedora)
+- Add RuntimeDirectory=redis to systemd unit file (RHBZ #1454700) (Fedora)
+- Mark rundir as %ghost since it may disappear (tmpfs - #1454700) (Fedora)
 
 * Wed May 17 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.9-1.ius
 - Latest upstream
