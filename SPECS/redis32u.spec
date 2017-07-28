@@ -43,6 +43,8 @@ Patch0003:         0003-redis-3.2.5-use-system-jemalloc.patch
 Patch0004:         0004-redis-2.8.18-disable-test-failed-on-slow-machine.patch
 # Fix sentinel configuration to use a different log file than redis
 Patch0005:         0005-redis-3.2.4-sentinel-configuration-file-fix.patch
+# https://github.com/antirez/redis/pull/3491 - man pages
+Patch0006:         0006-1st-man-pageis-for-redis-cli-redis-benchmark-redis-c.patch
 
 %if 0%{?with_perftools}
 BuildRequires:     gperftools-devel
@@ -114,6 +116,7 @@ rm -frv deps/jemalloc
 %patch0003 -p1
 %patch0004 -p1
 %patch0005 -p1
+%patch0006 -p1
 
 # No hidden build.
 sed -i -e 's|\t@|\t|g' deps/lua/src/Makefile
@@ -179,6 +182,14 @@ chmod 755 %{buildroot}%{_bindir}/redis-*
 
 # Install redis-shutdown
 install -pDm755 %{S:7} %{buildroot}%{_libexecdir}/redis-shutdown
+
+# Install man pages
+man=$(dirname %{buildroot}%{_mandir})
+for page in man/man?/*; do
+    install -Dpm644 $page $man/$page
+done
+ln -s redis-server.1 %{buildroot}%{_mandir}/man1/redis-sentinel.1
+ln -s redis.conf.5   %{buildroot}%{_mandir}/man5/redis-sentinel.conf.5
 
 
 %check
@@ -246,6 +257,8 @@ fi
 %dir %attr(0755, redis, redis) %{_localstatedir}/run/redis
 %{_bindir}/redis-*
 %{_libexecdir}/redis-*
+%{_mandir}/man1/redis*
+%{_mandir}/man5/redis*
 %if %{with systemd}
 %{_tmpfilesdir}/redis.conf
 %{_unitdir}/redis.service
@@ -265,6 +278,7 @@ fi
 * Fri Jul 28 2017 Carl George <carl@george.computer> - 3.2.10-1.ius
 - Latest upstream
 - Move redis-shutdown to libexec (Fedora)
+- Add missing man pages #1374577 https://github.com/antirez/redis/pull/3491 (Fedora)
 
 * Wed May 17 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.9-1.ius
 - Latest upstream
