@@ -178,7 +178,7 @@ install -p -D -m 644 %{S:9} %{buildroot}%{_sysconfdir}/security/limits.d/95-redi
 chmod 755 %{buildroot}%{_bindir}/redis-*
 
 # Install redis-shutdown
-install -pDm755 %{S:7} %{buildroot}%{_bindir}/redis-shutdown
+install -pDm755 %{S:7} %{buildroot}%{_libexecdir}/redis-shutdown
 
 
 %check
@@ -245,6 +245,7 @@ fi
 %dir %attr(0755, redis, redis) %{_localstatedir}/log/redis
 %dir %attr(0755, redis, redis) %{_localstatedir}/run/redis
 %{_bindir}/redis-*
+%{_libexecdir}/redis-*
 %if %{with systemd}
 %{_tmpfilesdir}/redis.conf
 %{_unitdir}/redis.service
@@ -263,6 +264,7 @@ fi
 %changelog
 * Fri Jul 28 2017 Carl George <carl@george.computer> - 3.2.10-1.ius
 - Latest upstream
+- Move redis-shutdown to libexec (Fedora)
 
 * Wed May 17 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.9-1.ius
 - Latest upstream
