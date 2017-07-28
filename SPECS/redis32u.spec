@@ -284,6 +284,7 @@ fi
 - Add missing man pages #1374577 https://github.com/antirez/redis/pull/3491 (Fedora)
 - Provide redis-check-rdb as a symlink to redis-server #1374736 https://github.com/antirez/redis/pull/3494 (Fedora)
 - Data and configuration should not be publicly readable #1374700 (Fedora)
+- Fix a shutdown failure with Unix domain sockets (RHBZ #1444988) (Fedora)
 
 * Wed May 17 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.9-1.ius
 - Latest upstream
