@@ -160,8 +160,8 @@ install -d %{buildroot}%{_localstatedir}/run/redis
 install -pDm644 %{S:1} %{buildroot}%{_sysconfdir}/logrotate.d/redis
 
 # Install configuration files.
-install -pDm644 redis.conf %{buildroot}%{_sysconfdir}/redis.conf
-install -pDm644 sentinel.conf %{buildroot}%{_sysconfdir}/redis-sentinel.conf
+install -pDm640 redis.conf %{buildroot}%{_sysconfdir}/redis.conf
+install -pDm640 sentinel.conf %{buildroot}%{_sysconfdir}/redis-sentinel.conf
 
 %if %{with systemd}
 # Install Systemd unit files.
@@ -253,11 +253,11 @@ fi
 %license COPYING
 %doc 00-RELEASENOTES BUGS CONTRIBUTING MANIFESTO README.md
 %config(noreplace) %{_sysconfdir}/logrotate.d/redis
-%attr(0644, redis, root) %config(noreplace) %{_sysconfdir}/redis.conf
-%attr(0644, redis, root) %config(noreplace) %{_sysconfdir}/redis-sentinel.conf
-%dir %attr(0755, redis, redis) %{_sharedstatedir}/redis
-%dir %attr(0755, redis, redis) %{_localstatedir}/log/redis
-%dir %attr(0755, redis, redis) %{_localstatedir}/run/redis
+%attr(0640, redis, root) %config(noreplace) %{_sysconfdir}/redis.conf
+%attr(0640, redis, root) %config(noreplace) %{_sysconfdir}/redis-sentinel.conf
+%dir %attr(0750, redis, redis) %{_sharedstatedir}/redis
+%dir %attr(0750, redis, redis) %{_localstatedir}/log/redis
+%dir %attr(0750, redis, redis) %{_localstatedir}/run/redis
 %{_bindir}/redis-*
 %{_libexecdir}/redis-*
 %{_mandir}/man1/redis*
@@ -283,6 +283,7 @@ fi
 - Move redis-shutdown to libexec (Fedora)
 - Add missing man pages #1374577 https://github.com/antirez/redis/pull/3491 (Fedora)
 - Provide redis-check-rdb as a symlink to redis-server #1374736 https://github.com/antirez/redis/pull/3494 (Fedora)
+- Data and configuration should not be publicly readable #1374700 (Fedora)
 
 * Wed May 17 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.9-1.ius
 - Latest upstream
