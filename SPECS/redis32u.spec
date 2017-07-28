@@ -10,7 +10,7 @@
 %bcond_without tests
 
 Name:              redis32u
-Version:           3.2.9
+Version:           3.2.10
 Release:           1.ius%{?dist}
 Summary:           A persistent key-value database
 %if 0%{?rhel} <= 6
@@ -261,6 +261,9 @@ fi
 
 
 %changelog
+* Fri Jul 28 2017 Carl George <carl@george.computer> - 3.2.10-1.ius
+- Latest upstream
+
 * Wed May 17 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.9-1.ius
 - Latest upstream
 
