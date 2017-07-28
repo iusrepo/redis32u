@@ -45,6 +45,8 @@ Patch0004:         0004-redis-2.8.18-disable-test-failed-on-slow-machine.patch
 Patch0005:         0005-redis-3.2.4-sentinel-configuration-file-fix.patch
 # https://github.com/antirez/redis/pull/3491 - man pages
 Patch0006:         0006-1st-man-pageis-for-redis-cli-redis-benchmark-redis-c.patch
+# https://github.com/antirez/redis/pull/3494 - symlink
+Patch0007:         0007-install-redis-check-rdb-as-a-symlink-instead-of-dupl.patch
 
 %if 0%{?with_perftools}
 BuildRequires:     gperftools-devel
@@ -117,6 +119,7 @@ rm -frv deps/jemalloc
 %patch0004 -p1
 %patch0005 -p1
 %patch0006 -p1
+%patch0007 -p1
 
 # No hidden build.
 sed -i -e 's|\t@|\t|g' deps/lua/src/Makefile
@@ -279,6 +282,7 @@ fi
 - Latest upstream
 - Move redis-shutdown to libexec (Fedora)
 - Add missing man pages #1374577 https://github.com/antirez/redis/pull/3491 (Fedora)
+- Provide redis-check-rdb as a symlink to redis-server #1374736 https://github.com/antirez/redis/pull/3494 (Fedora)
 
 * Wed May 17 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.9-1.ius
 - Latest upstream
