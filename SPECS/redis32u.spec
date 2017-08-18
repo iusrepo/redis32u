@@ -11,7 +11,7 @@
 
 Name:              redis32u
 Version:           3.2.10
-Release:           1.ius%{?dist}
+Release:           2.ius%{?dist}
 Summary:           A persistent key-value database
 %if 0%{?rhel} <= 6
 Group:             Applications/Databases
@@ -23,7 +23,6 @@ Source0:           http://download.redis.io/releases/redis-%{version}.tar.gz
 Source1:           redis.logrotate
 Source2:           redis-sentinel.service
 Source3:           redis.service
-Source4:           redis.tmpfiles
 Source5:           redis-sentinel.init
 Source6:           redis.init
 Source7:           redis-shutdown
@@ -168,8 +167,6 @@ install -pDm640 sentinel.conf %{buildroot}%{_sysconfdir}/redis-sentinel.conf
 mkdir -p %{buildroot}%{_unitdir}
 install -pm644 %{S:3} %{buildroot}%{_unitdir}
 install -pm644 %{S:2} %{buildroot}%{_unitdir}
-# Install systemd tmpfiles config.
-install -pDm644 %{S:4} %{buildroot}%{_tmpfilesdir}/redis.conf
 # Install systemd limit files (requires systemd >= 204)
 install -p -D -m 644 %{S:8} %{buildroot}%{_sysconfdir}/systemd/system/redis.service.d/limit.conf
 install -p -D -m 644 %{S:8} %{buildroot}%{_sysconfdir}/systemd/system/redis-sentinel.service.d/limit.conf
@@ -263,7 +260,6 @@ fi
 %{_mandir}/man1/redis*
 %{_mandir}/man5/redis*
 %if %{with systemd}
-%{_tmpfilesdir}/redis.conf
 %{_unitdir}/redis.service
 %{_unitdir}/redis-sentinel.service
 %dir %{_sysconfdir}/systemd/system/redis.service.d
@@ -278,6 +274,10 @@ fi
 
 
 %changelog
+* Fri Aug 18 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.10-2.ius
+- remove Source4 source from Fedora:
+  https://src.fedoraproject.org/rpms/redis/c/cf49c6bbe92ce9574c73c5fbc45ba42e3bbada7a?branch=master
+
 * Fri Jul 28 2017 Carl George <carl@george.computer> - 3.2.10-1.ius
 - Latest upstream
 - Move redis-shutdown to libexec (Fedora)
