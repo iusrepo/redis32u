@@ -2,6 +2,12 @@
 %global with_perftools 0
 
 %if 0%{?fedora} >= 19 || 0%{?rhel} >= 7
+%global with_redistrib 1
+%else
+%global with_redistrib 0
+%endif
+
+%if 0%{?fedora} >= 19 || 0%{?rhel} >= 7
 %bcond_without systemd
 %else
 %bcond_with systemd
@@ -10,8 +16,8 @@
 %bcond_without tests
 
 Name:              redis32u
-Version:           3.2.10
-Release:           2.ius%{?dist}
+Version:           3.2.11
+Release:           1.ius%{?dist}
 Summary:           A persistent key-value database
 %if 0%{?rhel} <= 6
 Group:             Applications/Databases
@@ -84,8 +90,8 @@ Conflicts: redis < %{version}
 
 
 %description
-Redis is an advanced key-value store. It is often referred to as a data 
-structure server since keys can contain strings, hashes, lists, sets and 
+Redis is an advanced key-value store. It is often referred to as a data
+structure server since keys can contain strings, hashes, lists, sets and
 sorted sets.
 
 You can run atomic operations on these types, like appending to a string;
@@ -108,6 +114,17 @@ a cache.
 
 You can use Redis from most programming languages also.
 
+%if 0%{?with_redistrib}
+%package           trib
+Summary:           Cluster management script for Redis
+BuildArch:         noarch
+Requires:          ruby
+Requires:          rubygem-redis
+
+%description       trib
+Redis cluster management utility providing cluster creation, node addition
+and removal, status checks, resharding, rebalancing, and other operations.
+%endif
 
 %prep
 %setup -q -n redis-%{version}
@@ -132,7 +149,6 @@ sed -i -e 's|$(LDFLAGS)|%{?__global_ldflags}|g' deps/hiredis/Makefile
 sed -i -e 's|$(CFLAGS)|%{optflags}|g' deps/linenoise/Makefile
 sed -i -e 's|$(LDFLAGS)|%{?__global_ldflags}|g' deps/linenoise/Makefile
 
-
 %build
 make %{?_smp_mflags} \
     DEBUG="" \
@@ -145,7 +161,6 @@ make %{?_smp_mflags} \
     MALLOC=jemalloc \
 %endif
     all
-
 
 %install
 make install INSTALL="install -p" PREFIX=%{buildroot}%{_prefix}
@@ -182,6 +197,11 @@ chmod 755 %{buildroot}%{_bindir}/redis-*
 
 # Install redis-shutdown
 install -pDm755 %{S:7} %{buildroot}%{_libexecdir}/redis-shutdown
+
+%if 0%{?with_redistrib}
+# Install redis-trib
+install -pDm755 src/redis-trib.rb %{buildroot}%{_bindir}/%{name}-trib
+%endif
 
 # Install man pages
 man=$(dirname %{buildroot}%{_mandir})
@@ -255,6 +275,9 @@ fi
 %dir %attr(0750, redis, redis) %{_sharedstatedir}/redis
 %dir %attr(0750, redis, redis) %{_localstatedir}/log/redis
 %dir %attr(0750, redis, redis) %ghost %{_localstatedir}/run/redis
+%if 0%{?with_redistrib}
+%exclude %{_bindir}/%{name}-trib
+%endif
 %{_bindir}/redis-*
 %{_libexecdir}/redis-*
 %{_mandir}/man1/redis*
@@ -272,8 +295,20 @@ fi
 %config(noreplace) %{_sysconfdir}/security/limits.d/95-redis.conf
 %endif
 
+%if 0%{?with_redistrib}
+%files trib
+%license COPYING
+%{_bindir}/%{name}-trib
+%endif
 
 %changelog
+* Thu Sep 21 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.11-1.ius
+- Latest upstream
+- add redis-trib from Fedora:
+  https://src.fedoraproject.org/rpms/redis/c/64e67eb9fe9855cedb2d74e8c13ba1377a1d3cb
+- fix permissions on service files from Fedora:
+  https://src.fedoraproject.org/rpms/redis/c/cf49c6bbe92ce9574c73c5fbc45ba42e3bbada7a
+
 * Fri Aug 18 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.10-2.ius
 - remove Source4 source from Fedora:
   https://src.fedoraproject.org/rpms/redis/c/cf49c6bbe92ce9574c73c5fbc45ba42e3bbada7a?branch=master
