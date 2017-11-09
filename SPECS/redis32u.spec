@@ -17,7 +17,7 @@
 
 Name:              redis32u
 Version:           3.2.11
-Release:           1.ius%{?dist}
+Release:           2.ius%{?dist}
 Summary:           A persistent key-value database
 %if 0%{?rhel} <= 6
 Group:             Applications/Databases
@@ -200,7 +200,7 @@ install -pDm755 %{S:7} %{buildroot}%{_libexecdir}/redis-shutdown
 
 %if 0%{?with_redistrib}
 # Install redis-trib
-install -pDm755 src/redis-trib.rb %{buildroot}%{_bindir}/%{name}-trib
+install -pDm755 src/redis-trib.rb %{buildroot}%{_bindir}/redis-trib
 %endif
 
 # Install man pages
@@ -276,7 +276,7 @@ fi
 %dir %attr(0750, redis, redis) %{_localstatedir}/log/redis
 %dir %attr(0750, redis, redis) %ghost %{_localstatedir}/run/redis
 %if 0%{?with_redistrib}
-%exclude %{_bindir}/%{name}-trib
+%exclude %{_bindir}/redis-trib
 %endif
 %{_bindir}/redis-*
 %{_libexecdir}/redis-*
@@ -298,10 +298,13 @@ fi
 %if 0%{?with_redistrib}
 %files trib
 %license COPYING
-%{_bindir}/%{name}-trib
+%{_bindir}/redis-trib
 %endif
 
 %changelog
+* Thu Nov 09 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.11-2.ius
+- correct name to redis-trib
+
 * Thu Sep 21 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.11-1.ius
 - Latest upstream
 - add redis-trib from Fedora:
