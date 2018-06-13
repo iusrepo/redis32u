@@ -16,8 +16,8 @@
 %bcond_without tests
 
 Name:              redis32u
-Version:           3.2.11
-Release:           2.ius%{?dist}
+Version:           3.2.12
+Release:           1.ius%{?dist}
 Summary:           A persistent key-value database
 %if 0%{?rhel} <= 6
 Group:             Applications/Databases
@@ -36,8 +36,8 @@ Source8:           redis-limit-systemd
 Source9:           redis-limit-init
 
 # To refresh patches:
-# tar xf redis-xxx.tar.gz && cd redis-xxx && git init && git add . && git commit -m "%{version} baseline"
-# git am %{patches}
+# tar xf redis-xxx.tar.gz && cd redis-xxx && git init && git add . && git commit -m "%%{version} baseline"
+# git am %%{patches}
 # Then refresh your patches
 # git format-patch HEAD~<number of expected patches>
 # Update configuration for Fedora
@@ -295,6 +295,7 @@ fi
 %config(noreplace) %{_sysconfdir}/security/limits.d/95-redis.conf
 %endif
 
+
 %if 0%{?with_redistrib}
 %files trib
 %license COPYING
@@ -302,6 +303,9 @@ fi
 %endif
 
 %changelog
+* Wed Jun 13 2018 Carl George <carl@george.computer> - 3.2.12-1.ius
+- Latest upstream
+
 * Thu Nov 09 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.11-2.ius
 - correct name to redis-trib
 
