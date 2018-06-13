@@ -41,17 +41,10 @@ Source9:           redis-limit-init
 # Then refresh your patches
 # git format-patch HEAD~<number of expected patches>
 # Update configuration for Fedora
-Patch0001:         0001-redis-3.2.1-redis-conf.patch
-Patch0002:         0002-redis-3.2.0-deps-library-fPIC-performance-tuning.patch
-Patch0003:         0003-redis-3.2.5-use-system-jemalloc.patch
-# tests/integration/replication-psync.tcl failed on slow machines(GITHUB #1417)
-Patch0004:         0004-redis-2.8.18-disable-test-failed-on-slow-machine.patch
-# Fix sentinel configuration to use a different log file than redis
-Patch0005:         0005-redis-3.2.4-sentinel-configuration-file-fix.patch
 # https://github.com/antirez/redis/pull/3491 - man pages
-Patch0006:         0006-1st-man-pageis-for-redis-cli-redis-benchmark-redis-c.patch
+Patch0001:         0001-1st-man-pageis-for-redis-cli-redis-benchmark-redis-c.patch
 # https://github.com/antirez/redis/pull/3494 - symlink
-Patch0007:         0007-install-redis-check-rdb-as-a-symlink-instead-of-dupl.patch
+Patch0002:         0002-install-redis-check-rdb-as-a-symlink-instead-of-dupl.patch
 
 %if 0%{?with_perftools}
 BuildRequires:     gperftools-devel
@@ -131,39 +124,30 @@ and removal, status checks, resharding, rebalancing, and other operations.
 rm -frv deps/jemalloc
 %patch0001 -p1
 %patch0002 -p1
-%patch0003 -p1
-%patch0004 -p1
-%patch0005 -p1
-%patch0006 -p1
-%patch0007 -p1
 
-# No hidden build.
-sed -i -e 's|\t@|\t|g' deps/lua/src/Makefile
-sed -i -e 's|$(QUIET_CC)||g' src/Makefile
-sed -i -e 's|$(QUIET_LINK)||g' src/Makefile
-sed -i -e 's|$(QUIET_INSTALL)||g' src/Makefile
-# Ensure deps are built with proper flags
-sed -i -e 's|$(CFLAGS)|%{optflags}|g' deps/Makefile
-sed -i -e 's|OPTIMIZATION?=-O3|OPTIMIZATION=%{optflags}|g' deps/hiredis/Makefile
-sed -i -e 's|$(LDFLAGS)|%{?__global_ldflags}|g' deps/hiredis/Makefile
-sed -i -e 's|$(CFLAGS)|%{optflags}|g' deps/linenoise/Makefile
-sed -i -e 's|$(LDFLAGS)|%{?__global_ldflags}|g' deps/linenoise/Makefile
+# Use system jemalloc library
+sed -i -e '/cd jemalloc && /d' deps/Makefile
+sed -i -e 's|../deps/jemalloc/lib/libjemalloc.a|-ljemalloc -ldl|g' src/Makefile
+sed -i -e 's|-I../deps/jemalloc.*|-DJEMALLOC_NO_DEMANGLE -I/usr/include/jemalloc|g' src/Makefile
+
+# Configuration file changes and additions
+sed -i -e 's|^logfile .*$|logfile /var/log/redis/redis.log|g' redis.conf
+sed -i -e '$ alogfile /var/log/redis/sentinel.log' sentinel.conf
+sed -i -e 's|^dir .*$|dir /var/lib/redis|g' redis.conf
+
+%if 0%{?with_perftools}
+%global malloc_flags	MALLOC=tcmalloc
+%else
+%global malloc_flags	MALLOC=jemalloc
+%endif
+%global make_flags	DEBUG="" V="echo" LDFLAGS="%{?__global_ldflags}" CFLAGS+="%{optflags} -fPIC" %{malloc_flags} INSTALL="install -p" PREFIX=%{buildroot}%{_prefix}
+
 
 %build
-make %{?_smp_mflags} \
-    DEBUG="" \
-    LDFLAGS="%{?__global_ldflags}" \
-    CFLAGS+="%{optflags}" \
-    LUA_LDFLAGS+="%{?__global_ldflags}" \
-%if 0%{?with_perftools}
-    MALLOC=tcmalloc \
-%else
-    MALLOC=jemalloc \
-%endif
-    all
+make %{?_smp_mflags} %{make_flags} all
 
 %install
-make install INSTALL="install -p" PREFIX=%{buildroot}%{_prefix}
+make %{make_flags} install
 
 # Filesystem.
 install -d %{buildroot}%{_sharedstatedir}/redis
@@ -214,8 +198,9 @@ ln -s redis.conf.5   %{buildroot}%{_mandir}/man5/redis-sentinel.conf.5
 
 %check
 %if 0%{?with_tests}
-make test
-make test-sentinel
+# https://github.com/antirez/redis/issues/1417 (for "taskset -c 1")
+taskset -c 1 make %{make_flags} test
+make %{make_flags} test-sentinel
 %endif
 
 
@@ -305,6 +290,7 @@ fi
 %changelog
 * Wed Jun 13 2018 Carl George <carl@george.computer> - 3.2.12-1.ius
 - Latest upstream
+- Sync patches and build flags with EPEL
 
 * Thu Nov 09 2017 Ben Harper <ben.harper@rackspace.com> - 3.2.11-2.ius
 - correct name to redis-trib
