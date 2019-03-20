@@ -16,7 +16,7 @@
 %bcond_without tests
 
 Name:              redis32u
-Version:           3.2.12
+Version:           3.2.13
 Release:           1.ius%{?dist}
 Summary:           A persistent key-value database
 %if 0%{?rhel} <= 6
@@ -288,6 +288,9 @@ fi
 %endif
 
 %changelog
+* Wed Mar 20 2019 Carl George <carl@george.computer> - 3.2.13-1.ius
+- Latest upstream
+
 * Wed Jun 13 2018 Carl George <carl@george.computer> - 3.2.12-1.ius
 - Latest upstream
 - Sync patches and build flags with EPEL
